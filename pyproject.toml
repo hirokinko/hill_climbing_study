@@ -8,6 +8,7 @@ authors = ["hirokinko <hiro.kinko@gmail.com>"]
 python = "^3.8"
 opencv-python = "^4.2.0"
 requests = "^2.23.0"
+pillow = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

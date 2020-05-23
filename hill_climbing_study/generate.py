@@ -1,11 +1,13 @@
 import os
 import tempfile
 from functools import partial
-from typing import Tuple
+from pathlib import Path
+from typing import Optional, Tuple
 
 import cv2
 import numpy
 import requests
+from PIL import Image
 
 MAX_GENERATIONS = 5000
 RAW_IMAGE_URL = "https://pbs.twimg.com/media/EYf0zecUEAAPPO2?format=jpg&name=large"
@@ -94,15 +96,22 @@ def resize_original_image(image: numpy.ndarray) -> numpy.ndarray:
     return resized_image
 
 
-def draw_current_image(generation, current_image) -> str:
+# TODO write test
+def draw_current_image(
+    generation: int, current_image: numpy.ndarray, sub_generation: Optional[int] = None
+) -> str:
     current_image = cv2.cvtColor(current_image, cv2.COLOR_RGB2BGR)
-    current_image_filename = f"{RESULT_UPLOAD_DIR}/image_generation_{generation}.jpeg"
+    sub_geneation_str = f"_{sub_generation:03}" if sub_generation is not None else ""
+    current_image_filename = (
+        f"{RESULT_UPLOAD_DIR}/image_generation_{generation}{sub_geneation_str}.jpeg"
+    )
     cv2.imwrite(current_image_filename, current_image)
     current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)
     return current_image_filename
 
 
-def main() -> None:
+# TODO write test
+def draw_pointillism() -> None:
     try:
         file_pointer, filename = tempfile.mkstemp(suffix=".jpeg")
 
@@ -124,13 +133,45 @@ def main() -> None:
                 round=10,
                 cool_down_count=100,
             )
-            if generation % 100 == 0:
+            if generation % 50 == 0:
                 draw_current_image(generation=generation, current_image=current_image)
             generation += 1
+
+        # last generation
+        draw_current_image(generation=generation, current_image=current_image)
+
+        # original
+        for sub_generation in range(50):
+            draw_current_image(
+                generation=generation + 1,
+                current_image=original_image,
+                sub_generation=sub_generation,
+            )
+
     finally:
         os.close(file_pointer)
         os.remove(filename)
 
 
+# TODO write test
+def generate_gif_annimation() -> None:
+    images = []
+    for image_filepath in sorted(
+        Path(RESULT_UPLOAD_DIR).glob("*.jpeg"), key=lambda p: p.stat().st_mtime_ns
+    ):
+        image = Image.open(str(image_filepath))
+        images.append(image)
+
+    images[0].save(
+        f"{RESULT_UPLOAD_DIR}/generated.gif",
+        save_all=True,
+        append_images=images[1:],
+        optimize=True,
+        duration=100,
+        loop=0,
+    )
+
+
 if __name__ == "__main__":
-    main()
+    draw_pointillism()
+    generate_gif_annimation()
