@@ -5,7 +5,7 @@ description = ""
 authors = ["hirokinko <hiro.kinko@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.7"
 opencv-python = "^4.2.0"
 requests = "^2.23.0"
 pillow = "^7.1.2"
@@ -13,7 +13,6 @@ opencv-contrib-python = "^4.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
-pytest-bandit = "^0.5.2"
 pytest-cov = "^2.9.0"
 pytest-mock = "^3.1.0"
 flake8 = "^3.8.2"
@@ -24,6 +23,7 @@ isort = {extras = ["pyproject"], version = "^4.3.21"}
 black = "^19.10b0"
 mypy = "^0.770"
 pre-commit = "^2.4.0"
+pytest-bandit = {git = "https://github.com/hirokinko/pytest-bandit.git", rev = "available-python3.7-after"}
 
 
 [tool.black]
